@@ -1,0 +1,16 @@
+## Chapter 8: Snapshots, Clones, and vMotion/Storage vMotion — Flashcards
+
+| # | Front (Question) | Back (Answer) |
+|---|-----------------|---------------|
+| 1 | Maximum number of snapshots supported in a single VM snapshot chain? | 32. Best practice: keep chain to 2-3 snapshots max and remove within 24-72 hours — long chains cause performance degradation and consolidation risk. |
+| 2 | What does the base disk plus delta disk architecture mean for a VM snapshot? | The original .vmdk (base disk) becomes read-only; all new writes go to a growable -delta.vmdk file. Exam tip: deleting a snapshot merges the delta back into the base — this merge is 'consolidation.' |
+| 3 | What triggers a 'needs consolidation' warning in vCenter? | Delta disk files remain on the datastore after a snapshot was deleted from Snapshot Manager but failed to fully merge into the base disk (e.g., interrupted job, backup software failure). Exam tip: fix via VM > Snapshots > Consolidate. |
+| 4 | Most common cause of 'snapshot sprawl' in production environments? | Backup software creating snapshots for application-consistent backups and failing to clean them up afterward, leaving orphaned growing delta disks. Exam tip: monitor snapshot age/size with vCenter alarms. |
+| 5 | Full clone vs Linked clone — key difference tested on exam? | Full clone: fully independent copy, no parent dependency, higher storage use. Linked clone: uses delta disks referencing a parent base disk, depends on parent remaining available, saves storage. |
+| 6 | Required storage condition for STANDARD vMotion (compute-only)? | Shared storage accessible by both source and destination ESXi hosts. Exam tip: without shared storage, use 'vMotion without shared storage' instead. |
+| 7 | Does Storage vMotion require shared storage between source and destination datastores? | No. Storage vMotion can migrate between local, shared, or different storage types/datastores with zero downtime while the VM stays on the same host. |
+| 8 | What is 'vMotion without shared storage'? | A combined compute + storage live migration: memory state and disk data are both copied over the network simultaneously to a host/datastore with no shared storage relationship to the source. |
+| 9 | What does an EVC (Enhanced vMotion Compatibility) baseline do? | Masks all hosts in a cluster to the CPU feature set of the lowest common denominator so vMotion works across different CPU generations of the SAME vendor. Exam tip: cannot mix Intel and AMD in one EVC cluster. |
+| 10 | Minimum recommended network bandwidth for a vMotion VMkernel network? | 250 Mbps minimum; 10 Gbps recommended, especially for multi-NIC vMotion configurations. Exam tip: below the minimum, vMotion is blocked or severely degraded. |
+| 11 | What VMkernel adapter setting is a mandatory vMotion prerequisite on BOTH hosts? | The vMotion service/traffic type must be enabled on a VMkernel adapter on the source and destination hosts. Exam tip: forgetting to enable this checkbox is a classic reason vMotion fails despite CPUs and storage being fine. |
+| 12 | Can a VM with active snapshots be vMotioned? | Yes — modern vSphere fully supports migrating VMs that have snapshots via vMotion; snapshots are NOT a blocking prerequisite. Exam trap: don't assume snapshots prevent vMotion. |
